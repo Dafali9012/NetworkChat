@@ -9,10 +9,13 @@ public class Program {
     private Program() {
         Thread clientThread = new Thread(NetworkClient.getInstance());
         Thread serverThread = new Thread(NetworkServer.getInstance());
+        serverThread.start();
         clientThread.start();
-        //serverThread.start();
+
         Scanner scan = new Scanner(System.in);
-        NetworkClient.getInstance().sendMsgToServer("Hej Enkel");
+        while(true) {
+            NetworkClient.getInstance().sendMsgToServer("Dafali: "+scan.nextLine());
+        }
     }
 
     public static Program getInstance() {

@@ -6,7 +6,7 @@ import java.net.InetAddress;
 
 public class NetworkClient implements Runnable{
     private static final NetworkClient instance = new NetworkClient();
-    private final String SERVER_IP = "10.152.188.50";
+    private final String SERVER_IP = "localhost";
     private final int MSG_SIZE = 512;
     private final int SLEEP_MS = 100;
 
@@ -18,7 +18,6 @@ public class NetworkClient implements Runnable{
     private NetworkClient(){
         try {
             serverAddress = InetAddress.getByName(SERVER_IP);
-
             socket = new DatagramSocket(0);
             socket.setSoTimeout(SLEEP_MS);
         } catch(Exception e){ System.out.println(e.getMessage()); }
@@ -45,10 +44,10 @@ public class NetworkClient implements Runnable{
         }
     }
 
+    @Override
     public void run() {
         while (isRunning) {
             receiveMessageFromServer();
-            //System.out.println("client thread");
         }
     }
 

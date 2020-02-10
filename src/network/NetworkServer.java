@@ -1,6 +1,8 @@
 package network;
 
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkServer implements Runnable {
     private static final NetworkServer instance = new NetworkServer();
@@ -10,6 +12,8 @@ public class NetworkServer implements Runnable {
     private DatagramSocket socket;
 
     private boolean isRunning = true;
+
+    List<SocketAddress> connectedAdresses = new ArrayList<>();
 
     private NetworkServer() {
         try {
@@ -33,22 +37,25 @@ public class NetworkServer implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         while (isRunning) {
             DatagramPacket clientRequest = new DatagramPacket(new byte[MSG_SIZE], MSG_SIZE);
-            //System.out.println("server thread");
-
             if (!receiveMsgFromAnyClient(clientRequest)) {
                 continue;
             }
-
+            if(!connectedAdresses.contains(clientRequest.getSocketAddress())) {
+                connectedAdresses.add(clientRequest.getSocketAddress());
+            }
             String clientMsg = new String(clientRequest.getData(), 0, clientRequest.getLength());
-            System.out.println(clientMsg); // debugging purpose only!
+            //System.out.println("Server received msg: "+clientMsg); // debugging purpose only!
+            List<SocketAddress> newAdresses = new ArrayList<>(connectedAdresses);
+            newAdresses.remove(clientRequest.getSocketAddress());
+            for(SocketAddress address: newAdresses) {
+                sendMsgToClient(clientMsg, address);
+            }
+
             // TODO: Save the msg to a queue instead
-
-
-
-            sendMsgToClient("Hej hopp", clientRequest.getSocketAddress());
         }
     }
 
